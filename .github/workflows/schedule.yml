@@ -1,0 +1,36 @@
+name: Travel Duration Scheduler
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour at minute 0 (UTC time)
+  workflow_dispatch:      # Allows manual triggering of the workflow
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install google-search-results
+
+      - name: Run script
+        env:
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+        run: |
+          python travel_duration_scheduler.py
+
+      - name: Upload CSV file
+        uses: actions/upload-artifact@v3
+        with:
+          name: travel_durations
+          path: travel_durations.csv
