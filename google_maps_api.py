@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 
 # Replace with your actual SerpApi API key
-SERPAPI_API_KEY = '31334acf409ab3983059392e8ab812296d168e54e29d64cb6ae53ac2e00d6cff'
+SERPAPI_API_KEY = os.getenv('SERPAPI_API_KEY')
 
 # Define your 10 routes with origins and destinations
 routes = [
@@ -57,7 +57,7 @@ def process_routes():
     api_call_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
     # Use a relative path for the CSV file
-    csv_file_path = r'C:/Knime/Data/travel_durations.csv'
+    csv_file_path = 'travel_durations.csv'
 
 
     # Check if the file exists to decide whether to write the header
