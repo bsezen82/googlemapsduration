@@ -37,12 +37,24 @@ jobs:
 
       - name: commit CSV file
         if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git pull --rebase
+          
+          # Ensure we're on the correct branch
+          git checkout ${{ github.ref }}
+          
+          # Set up the remote repository
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+
+          # Add and commit changes
           git add travel_durations.csv
           git commit -m 'Update travel durations [skip ci]' || echo "No changes to commit"
-          git push origin ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Pull latest changes and rebase
+          git pull --rebase origin ${{ github.ref }}
+
+          # Push changes back to the repository
+          git push origin HEAD:${{ github.ref }}
