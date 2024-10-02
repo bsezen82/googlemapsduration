@@ -35,14 +35,14 @@ jobs:
           name: travel_durations
           path: travel_durations.csv
 
-       - name: Commit CSV file
-         if: success()
-         run: |
-           git config --global user.name 'github-actions[bot]'
-           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-           git pull --rebase
-           git add travel_durations.csv
-           git commit -m 'Update travel durations [skip ci]' || echo "No changes to commit"
-           git push origin ${{ github.ref }}
-         env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: commit CSV file
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git pull --rebase
+          git add travel_durations.csv
+          git commit -m 'Update travel durations [skip ci]' || echo "No changes to commit"
+          git push origin ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
