@@ -2,7 +2,7 @@ name: Travel Duration Scheduler
 
 on:
   schedule:
-    # Rush hour (UTC) — 06:15 & 06:45 to 09:15 & 09:45
+    # Rush hours (06–09 and 15–19 UTC): 15 and 45 past each hour
     - cron: '15 6 * * *'
     - cron: '45 6 * * *'
     - cron: '15 7 * * *'
@@ -11,8 +11,6 @@ on:
     - cron: '45 8 * * *'
     - cron: '15 9 * * *'
     - cron: '45 9 * * *'
-
-    # Afternoon/evening rush hour (UTC) — 15:15 & 15:45 to 19:15 & 19:45
     - cron: '15 15 * * *'
     - cron: '45 15 * * *'
     - cron: '15 16 * * *'
@@ -24,7 +22,7 @@ on:
     - cron: '15 19 * * *'
     - cron: '45 19 * * *'
 
-    # Other hours — every hour at :30
+    # All other hours: 30 past each hour
     - cron: '30 0 * * *'
     - cron: '30 1 * * *'
     - cron: '30 2 * * *'
@@ -61,14 +59,14 @@ jobs:
           pip install --upgrade pip
           pip install pandas openpyxl serpapi
 
-      - name: Run script
+      - name: Run travel duration script
         env:
           SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
         run: |
           python travel_duration_scheduler.py
 
       - name: Upload CSV file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: travel_durations
           path: travel_durations.csv
