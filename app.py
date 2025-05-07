@@ -6,6 +6,7 @@ import altair as alt
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
 st.title("🕋 Hajj Travel Durations - Haram Focus")
 
+@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
@@ -24,7 +25,7 @@ df_today = df[df["Date"] == today]
 from_haram = df_today[df_today["Origin Name"].str.lower().str.contains("haram")]
 from_haram_grouped = from_haram.groupby("Hour").apply(
     lambda g: pd.Series({
-        "Weighted Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
+        "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
     })
 ).reset_index()
 from_haram_overall_duration = (from_haram["Duration (min)"] * from_haram["Distance (km)"].fillna(0)).sum() / from_haram["Distance (km)"].fillna(0).sum()
@@ -44,20 +45,20 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f"⬅️ From Haram (avg. {from_haram_avg_distance:.1f} km)")
-    st.metric("Avg Duration (min)", f"{from_haram_overall_duration:.1f}" if from_haram_overall_duration else "N/A")
+    st.metric("Average Duration (min)", f"{from_haram_overall_duration:.1f}" if from_haram_overall_duration else "N/A")
     chart = alt.Chart(from_haram_grouped).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(from_haram_grouped["Hour"])),
         y="Weighted Duration (min)",
-        tooltip=["Hour", "Avg Duration (min)"]
+        tooltip=["Hour", "Weighted Duration (min)"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
 with col2:
     st.subheader(f"➡️ To Haram (avg. {to_haram_avg_distance:.1f} km)")
-    st.metric("Avg Duration (min)", f"{to_haram_overall_duration:.1f}" if to_haram_overall_duration else "N/A")
+    st.metric("Weighted Avg Duration (min)", f"{to_haram_overall_duration:.1f}" if to_haram_overall_duration else "N/A")
     chart = alt.Chart(to_haram_grouped).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(to_haram_grouped["Hour"])),
         y="Weighted Duration (min)",
-        tooltip=["Hour", "Avg Duration (min)"]
+        tooltip=["Hour", "Weighted Duration (min)"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
