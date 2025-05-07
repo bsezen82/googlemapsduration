@@ -6,29 +6,17 @@ import altair as alt
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
 st.title("🕋 Hajj Travel Durations - Haram Focus")
 
+@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
     df["Date"] = df["API Call Time"].dt.date
     df["Hour"] = df["API Call Time"].dt.strftime("%H:00")
 
-    # Parse duration in minutes
-    def parse_duration(d):
-        try:
-            d = d.lower().replace("mins", "min")
-            parts = d.split()
-            m = 0
-            for i, p in enumerate(parts):
-                if p in ["hour", "hours"]:
-                    m += int(parts[i-1]) * 60
-                elif p == "min":
-                    m += int(parts[i-1])
-            return m
-        except:
-            return None
-
-    df["Duration (min)"] = df["Travel Duration"].apply(parse_duration)
-    df["Distance (km)"] = df["Distance"].str.replace("km", "").str.strip().astype(float)
+    # Duration is in seconds; convert to minutes
+    df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
+    # Distance is in meters; convert to km
+    df["Distance (km)"] = df["Distance"] / 1000
     return df
 
 df = load_data()
