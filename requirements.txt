@@ -1,4 +1,4 @@
-serpapi==2.4.2
+serpapi
 pandas
 openpyxl
 streamlit
