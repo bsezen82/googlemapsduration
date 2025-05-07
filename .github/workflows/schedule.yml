@@ -67,13 +67,6 @@ jobs:
         run: |
           python travel_duration_scheduler.py
 
-      - name: Upload CSV artifact
-        if: success() && steps.run-travel-duration-script.conclusion == 'success'
-        uses: actions/upload-artifact@v3
-        with:
-          name: travel_durations
-          path: travel_durations.csv
-
       - name: Commit CSV file back to repo
         if: success()
         env:
