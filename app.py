@@ -44,20 +44,20 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f"⬅️ From Haram (avg. {from_haram_avg_distance:.1f} km)")
-    st.metric("Weighted Avg Duration (min)", f"{from_haram_overall_duration:.1f}" if from_haram_overall_duration else "N/A")
+    st.metric("Avg Duration (min)", f"{from_haram_overall_duration:.1f}" if from_haram_overall_duration else "N/A")
     chart = alt.Chart(from_haram_grouped).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(from_haram_grouped["Hour"])),
         y="Weighted Duration (min)",
-        tooltip=["Hour", "Weighted Duration (min)"]
+        tooltip=["Hour", "Avg Duration (min)"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
 with col2:
     st.subheader(f"➡️ To Haram (avg. {to_haram_avg_distance:.1f} km)")
-    st.metric("Weighted Avg Duration (min)", f"{to_haram_overall_duration:.1f}" if to_haram_overall_duration else "N/A")
+    st.metric("Avg Duration (min)", f"{to_haram_overall_duration:.1f}" if to_haram_overall_duration else "N/A")
     chart = alt.Chart(to_haram_grouped).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(to_haram_grouped["Hour"])),
         y="Weighted Duration (min)",
-        tooltip=["Hour", "Weighted Duration (min)"]
+        tooltip=["Hour", "Avg Duration (min)"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
