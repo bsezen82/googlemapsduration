@@ -59,7 +59,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pandas openpyxl serpapi
+          pip install pandas openpyxl serpapi google-search-results
 
       - name: Run travel-duration script
         env:
