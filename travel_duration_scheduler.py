@@ -2,6 +2,7 @@ import json
 from serpapi import GoogleSearch
 import csv
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 import pandas as pd
 
@@ -49,7 +50,7 @@ def get_travel_duration(start_coords, end_coords):
         return None, None
 
 def process_routes():
-    api_call_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    api_call_time = datetime.now(ZoneInfo("Asia/Riyadh")).strftime("%Y-%m-%d %H:%M:%S")
     csv_file_path = 'travel_durations.csv'
     file_exists = os.path.isfile(csv_file_path)
 
