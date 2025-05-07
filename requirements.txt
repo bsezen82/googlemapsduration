@@ -2,3 +2,4 @@ serpapi
 pandas
 openpyxl
 streamlit
+altair
