@@ -1,3 +1,4 @@
 serpapi==2.4.2
 pandas
 openpyxl
+streamlit
