@@ -6,7 +6,6 @@ import altair as alt
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
 st.title("🕋 Hajj Travel Durations - Haram Focus")
 
-@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
@@ -35,7 +34,7 @@ from_haram_avg_distance = from_haram["Distance (km)"].mean()
 to_haram = df_today[df_today["Destination Name"].str.lower().str.contains("haram")]
 to_haram_grouped = to_haram.groupby("Hour").apply(
     lambda g: pd.Series({
-        "Weighted Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
+        "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
     })
 ).reset_index()
 to_haram_overall_duration = (to_haram["Duration (min)"] * to_haram["Distance (km)"].fillna(0)).sum() / to_haram["Distance (km)"].fillna(0).sum()
@@ -48,8 +47,8 @@ with col1:
     st.metric("Average Duration (min)", f"{from_haram_overall_duration:.1f}" if from_haram_overall_duration else "N/A")
     chart = alt.Chart(from_haram_grouped).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(from_haram_grouped["Hour"])),
-        y="Weighted Duration (min)",
-        tooltip=["Hour", "Weighted Duration (min)"]
+        y="Average Duration (min)",
+        tooltip=["Hour", "Average Duration (min)"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
