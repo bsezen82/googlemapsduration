@@ -21,13 +21,23 @@ df = load_data()
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
-df_today = df[df["Date"] == today]
-df_yesterday = df[df["Date"] == yesterday]
+# ROTAYA GÖRE FİLTRELEME
+unique_from = df["Origin Name"].dropna().unique()
+unique_to = df["Destination Name"].dropna().unique()
 
-# FROM HARAM
-def prepare_line_data(df_source, label):
-    from_haram = df_source[df_source["Origin Name"].str.lower().str.contains("haram")]
-    grouped = from_haram.groupby("Hour").apply(
+col_from, col_to = st.columns(2)
+with col_from:
+    selected_from = st.selectbox("Select From Location", sorted(unique_from))
+with col_to:
+    selected_to = st.selectbox("Select To Location", sorted(unique_to))
+
+# Filtrelenmiş veri (Today ve Yesterday)
+df_today = df[(df["Date"] == today) & (df["Origin Name"] == selected_from) & (df["Destination Name"] == selected_to)]
+df_yesterday = df[(df["Date"] == yesterday) & (df["Origin Name"] == selected_from) & (df["Destination Name"] == selected_to)]
+
+# Saatlik ortalamaları hesapla
+def hourly_weighted(df_part, label):
+    grouped = df_part.groupby("Hour").apply(
         lambda g: pd.Series({
             "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
         })
@@ -35,53 +45,15 @@ def prepare_line_data(df_source, label):
     grouped["Day"] = label
     return grouped
 
-from_haram_today = prepare_line_data(df_today, "Today")
-from_haram_yesterday = prepare_line_data(df_yesterday, "Yesterday")
-from_haram_combined = pd.concat([from_haram_today, from_haram_yesterday])
-from_haram_overall = (df_today[df_today["Origin Name"].str.lower().str.contains("haram")]["Duration (min)"] * df_today[df_today["Origin Name"].str.lower().str.contains("haram")]["Distance (km)"].fillna(0)).sum() / df_today[df_today["Origin Name"].str.lower().str.contains("haram")]["Distance (km)"].fillna(0).sum()
-from_haram_avg_distance = df_today[df_today["Origin Name"].str.lower().str.contains("haram")]["Distance (km)"].mean()
+hourly_today = hourly_weighted(df_today, "Today")
+hourly_yesterday = hourly_weighted(df_yesterday, "Yesterday")
+hourly_combined = pd.concat([hourly_today, hourly_yesterday])
 
-# TO HARAM
-def prepare_line_data_to(df_source, label):
-    to_haram = df_source[df_source["Destination Name"].str.lower().str.contains("haram")]
-    grouped = to_haram.groupby("Hour").apply(
-        lambda g: pd.Series({
-            "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
-        })
-    ).reset_index()
-    grouped["Day"] = label
-    return grouped
-
-to_haram_today = prepare_line_data_to(df_today, "Today")
-to_haram_yesterday = prepare_line_data_to(df_yesterday, "Yesterday")
-to_haram_combined = pd.concat([to_haram_today, to_haram_yesterday])
-to_haram_overall = (df_today[df_today["Destination Name"].str.lower().str.contains("haram")]["Duration (min)"] * df_today[df_today["Destination Name"].str.lower().str.contains("haram")]["Distance (km)"].fillna(0)).sum() / df_today[df_today["Destination Name"].str.lower().str.contains("haram")]["Distance (km)"].fillna(0).sum()
-to_haram_avg_distance = df_today[df_today["Destination Name"].str.lower().str.contains("haram")]["Distance (km)"].mean()
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader(f"⬅️ From Haram (avg. {from_haram_avg_distance:.1f} km)")
-    st.metric("Average Duration (min)", f"{from_haram_overall:.1f}" if from_haram_overall else "N/A")
-    chart = alt.Chart(from_haram_combined).mark_line(point=True).encode(
-        x=alt.X("Hour", sort=list(from_haram_combined["Hour"].unique())),
-        y="Average Duration (min)",
-        color="Day",
-        tooltip=["Hour", "Average Duration (min)", "Day"]
-    ).properties(height=300)
-    st.altair_chart(chart, use_container_width=True)
-
-    
-
-with col2:
-    st.subheader(f"➡️ To Haram (avg. {to_haram_avg_distance:.1f} km)")
-    st.metric("Average Duration (min)", f"{to_haram_overall:.1f}" if to_haram_overall else "N/A")
-    chart = alt.Chart(to_haram_combined).mark_line(point=True).encode(
-        x=alt.X("Hour", sort=list(to_haram_combined["Hour"].unique())),
-        y="Average Duration (min)",
-        color="Day",
-        tooltip=["Hour", "Average Duration (min)", "Day"]
-    ).properties(height=300)
-    st.altair_chart(chart, use_container_width=True)
-
-    
+st.subheader(f"📈 Duration Trend for Route: {selected_from} → {selected_to}")
+route_chart = alt.Chart(hourly_combined).mark_line(point=True).encode(
+    x=alt.X("Hour", sort=list(hourly_combined["Hour"].unique())),
+    y="Average Duration (min)",
+    color="Day",
+    tooltip=["Hour", "Average Duration (min)", "Day"]
+).properties(height=350)
+st.altair_chart(route_chart, use_container_width=True)
