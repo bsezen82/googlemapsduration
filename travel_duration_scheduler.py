@@ -14,6 +14,8 @@ def load_data():
 
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
+        df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+    df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
 df = load_data()
