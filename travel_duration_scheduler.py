@@ -116,7 +116,7 @@ import folium
 from streamlit_folium import st_folium
 
 # Get one sample row for selected route to fetch coordinates
-sample_row = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)].dropna(subset=["Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"]).head(1)
+sample_row = filtered.dropna(subset=["Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"]).head(1)
 
 if not sample_row.empty:
     origin_lat = sample_row["Origin Lat"].values[0]
