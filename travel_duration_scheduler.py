@@ -4,7 +4,7 @@ import datetime
 import altair as alt
 
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
-st.title("🕋 Hajj Travel Durations - Haram Focus")
+st.title("🕋 Makkah Travel Durations - Haram Focus")
 
 def load_data():
     df = pd.read_csv("travel_durations.csv")
@@ -14,7 +14,7 @@ def load_data():
 
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
-        df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+    df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
     df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
