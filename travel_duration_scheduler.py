@@ -16,6 +16,7 @@ def load_data():
     df["Distance (km)"] = df["Distance"] / 1000
     df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
     df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
+
     return df
 
 df = load_data()
