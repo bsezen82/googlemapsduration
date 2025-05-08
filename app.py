@@ -136,7 +136,7 @@ if expected_columns.issubset(filtered.columns):
         folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
 
         st.subheader("🗺️ Selected Points")
-        st_folium(m, width=700, height=500)
+        st_folium(m, width=300, height=200)
 # Show average distance for the selected route
 distance_avg = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)]["Distance (km)"].mean()
 if not pd.isna(distance_avg):
