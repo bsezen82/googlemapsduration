@@ -6,6 +6,7 @@ import altair as alt
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
 st.title("🕋 Hajj Travel Durations - Haram Focus")
 
+@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
@@ -70,19 +71,7 @@ with col1:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-    # 7-day trend for From Haram
-    recent_from = df[df["Origin Name"].str.lower().str.contains("haram")]
-    recent_from_grouped = recent_from.groupby("Date").apply(
-        lambda g: (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
-    ).reset_index(name="Average Duration (min)")
-    recent_from_grouped = recent_from_grouped[recent_from_grouped["Date"] >= today - datetime.timedelta(days=6)]
-    st.subheader("📈 7-Day Trend (From Haram)")
-    trend_chart = alt.Chart(recent_from_grouped).mark_line(point=True).encode(
-        x=alt.X("Date:T"),
-        y="Average Duration (min)",
-        tooltip=["Date", "Average Duration (min)"]
-    ).properties(height=300)
-    st.altair_chart(trend_chart, use_container_width=True)
+    
 
 with col2:
     st.subheader(f"➡️ To Haram (avg. {to_haram_avg_distance:.1f} km)")
@@ -95,16 +84,4 @@ with col2:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-    # 7-day trend for To Haram
-    recent_to = df[df["Destination Name"].str.lower().str.contains("haram")]
-    recent_to_grouped = recent_to.groupby("Date").apply(
-        lambda g: (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
-    ).reset_index(name="Average Duration (min)")
-    recent_to_grouped = recent_to_grouped[recent_to_grouped["Date"] >= today - datetime.timedelta(days=6)]
-    st.subheader("📈 7-Day Trend (To Haram)")
-    trend_chart = alt.Chart(recent_to_grouped).mark_line(point=True).encode(
-        x=alt.X("Date:T"),
-        y="Average Duration (min)",
-        tooltip=["Date", "Average Duration (min)"]
-    ).properties(height=300)
-    st.altair_chart(trend_chart, use_container_width=True)
+    
