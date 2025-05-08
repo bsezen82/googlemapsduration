@@ -14,8 +14,6 @@ def load_data():
 
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
-        df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-    df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
 df = load_data()
@@ -26,9 +24,6 @@ df = load_data()
 df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
 df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
 
-# Split coordinate strings into numeric lat/lng columns for mapping
-df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
@@ -97,8 +92,6 @@ with col2:
 st.markdown("---")
 st.header("📍 Route-Specific Comparison")
 route_df = df[df["Date"].isin([today, yesterday])].copy()
-route_df[["Origin Lat", "Origin Lng"]] = route_df["Origin Coords"].str.split(",", expand=True).astype(float)
-route_df[["Destination Lat", "Destination Lng"]] = route_df["Destination Coords"].str.split(",", expand=True).astype(float)
 from_options = sorted(route_df["Origin Name"].dropna().unique())
 selected_from = st.selectbox("Select Origin", from_options, key="route_origin")
 
