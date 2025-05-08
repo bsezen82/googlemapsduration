@@ -6,6 +6,7 @@ import altair as alt
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
 st.title("🕋 Hajj Travel Durations - Haram Focus")
 
+@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
@@ -86,13 +87,13 @@ st.markdown("---")
 st.header("📍 Route-Specific Comparison")
 route_df = df[df["Date"].isin([today, yesterday])].copy()
 from_options = sorted(route_df["Origin Name"].dropna().unique())
-selected_from = st.selectbox("Select Origin", from_options)
+selected_from = st.selectbox("Select Origin", from_options, key="route_origin")
 
 filtered_df = route_df[route_df["Origin Name"] == selected_from]
 to_options = sorted(filtered_df["Destination Name"].dropna().unique())
 
 selected_from = st.selectbox("Select Origin", from_options)
-selected_to = st.selectbox("Select Destination", to_options)
+selected_to = st.selectbox("Select Destination", to_options, key="route_destination")
 
 filtered = route_df[(route_df["Origin Name"] == selected_from) & (route_df["Destination Name"] == selected_to)]
 
