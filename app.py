@@ -134,9 +134,8 @@ if expected_columns.issubset(filtered.columns):
 
         folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
         folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
-        folium.PolyLine(locations=[(origin_lat, origin_lng), (dest_lat, dest_lng)], color="blue", weight=4).add_to(m)
 
-        st.subheader("🗺️ Map View of Selected Route")
+        st.subheader("🗺️ Selected Points")
         st_folium(m, width=700, height=500)
 # Show average distance for the selected route
 distance_avg = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)]["Distance (km)"].mean()
