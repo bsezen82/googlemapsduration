@@ -11,24 +11,12 @@ def load_data():
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
     df["Date"] = df["API Call Time"].dt.date
     df["Hour"] = df["API Call Time"].dt.strftime("%H:00")
-
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
-    df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-    df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
 df = load_data()
 
-# Split coordinates into numeric latitude and longitude
-# Assumes no missing values and proper formatting
-
-df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
-
-# Split coordinate strings into numeric lat/lng columns for mapping
-df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
