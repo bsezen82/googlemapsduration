@@ -91,7 +91,6 @@ selected_from = st.selectbox("Select Origin", from_options, key="route_origin")
 filtered_df = route_df[route_df["Origin Name"] == selected_from]
 to_options = sorted(filtered_df["Destination Name"].dropna().unique())
 
-selected_from = st.selectbox("Select Origin", from_options)
 selected_to = st.selectbox("Select Destination", to_options, key="route_destination")
 
 filtered = route_df[(route_df["Origin Name"] == selected_from) & (route_df["Destination Name"] == selected_to)]
