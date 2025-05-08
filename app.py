@@ -14,9 +14,21 @@ def load_data():
 
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
+        df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+    df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
 df = load_data()
+
+# Split coordinates into numeric latitude and longitude
+# Assumes no missing values and proper formatting
+
+df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
+
+# Split coordinate strings into numeric lat/lng columns for mapping
+df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
@@ -85,6 +97,8 @@ with col2:
 st.markdown("---")
 st.header("📍 Route-Specific Comparison")
 route_df = df[df["Date"].isin([today, yesterday])].copy()
+route_df[["Origin Lat", "Origin Lng"]] = route_df["Origin Coords"].str.split(",", expand=True).astype(float)
+route_df[["Destination Lat", "Destination Lng"]] = route_df["Destination Coords"].str.split(",", expand=True).astype(float)
 from_options = sorted(route_df["Origin Name"].dropna().unique())
 selected_from = st.selectbox("Select Origin", from_options, key="route_origin")
 
@@ -111,25 +125,26 @@ st.altair_chart(route_chart, use_container_width=True)
 import folium
 from streamlit_folium import st_folium
 
-# Get one sample row for selected route to fetch coordinates
-sample_row = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)].dropna(subset=["Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"]).head(1)
+expected_columns = {"Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"}
+if expected_columns.issubset(filtered.columns):
+    sample_row = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)].dropna(subset=["Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"]).head(1)
 
-if not sample_row.empty:
-    origin_lat = sample_row["Origin Lat"].values[0]
-    origin_lng = sample_row["Origin Lng"].values[0]
-    dest_lat = sample_row["Destination Lat"].values[0]
-    dest_lng = sample_row["Destination Lng"].values[0]
+    if not sample_row.empty:
+        origin_lat = sample_row["Origin Lat"].values[0]
+        origin_lng = sample_row["Origin Lng"].values[0]
+        dest_lat = sample_row["Destination Lat"].values[0]
+        dest_lng = sample_row["Destination Lng"].values[0]
 
-    midpoint = [(origin_lat + dest_lat) / 2, (origin_lng + dest_lng) / 2]
+        midpoint = [(origin_lat + dest_lat) / 2, (origin_lng + dest_lng) / 2]
 
-    m = folium.Map(location=midpoint, zoom_start=13)
+        m = folium.Map(location=midpoint, zoom_start=13)
 
-    folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
-    folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
-    folium.PolyLine(locations=[(origin_lat, origin_lng), (dest_lat, dest_lng)], color="blue", weight=4).add_to(m)
+        folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
+        folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
+        folium.PolyLine(locations=[(origin_lat, origin_lng), (dest_lat, dest_lng)], color="blue", weight=4).add_to(m)
 
-    st.subheader("🗺️ Map View of Selected Route")
-    st_folium(m, width=700, height=500)
+        st.subheader("🗺️ Map View of Selected Route")
+        st_folium(m, width=700, height=500)
 # Show average distance for the selected route
 distance_avg = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)]["Distance (km)"].mean()
 if not pd.isna(distance_avg):
