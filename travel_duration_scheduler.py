@@ -52,9 +52,6 @@ def get_travel_duration(start_coords, end_coords):
 def process_routes():
     api_call_time = datetime.now(ZoneInfo("Asia/Riyadh")).strftime("%Y-%m-%d %H:%M:%S")
     csv_file_path = 'travel_durations.csv'
-    json_output_dir = 'route_jsons'
-    os.makedirs(json_output_dir, exist_ok=True)
-
     file_exists = os.path.isfile(csv_file_path)
 
     with open(csv_file_path, mode='a', newline='', encoding='utf-8') as file:
@@ -66,15 +63,7 @@ def process_routes():
                 'Travel Duration', 'Distance'
             ])
         for route in routes:
-            duration, distance, full_json = get_travel_duration(route['start_coords'], route['end_coords'])
-
-            # Save raw JSON for later map use
-            if full_json:
-                json_filename = f"{route['origin_name'].replace(' ', '_')}__{route['destination_name'].replace(' ', '_')}.json"
-                json_path = os.path.join(json_output_dir, json_filename)
-                with open(json_path, 'w', encoding='utf-8') as jf:
-                    json.dump(full_json, jf, ensure_ascii=False, indent=2)
-
+            duration, distance = get_travel_duration(route['start_coords'], route['end_coords'])
             writer.writerow([
                 api_call_time,
                 route['origin_name'],
