@@ -119,26 +119,27 @@ import requests
 import folium
 from streamlit_folium import st_folium
 
-def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
-    url = f"http://router.project-osrm.org/route/v1/driving/{origin_lng},{origin_lat};{dest_lng},{dest_lat}?overview=full&geometries=geojson"
-    response = requests.get(url)
-    route_data = response.json()
+def draw_google_route_map(response_data, origin_lat, origin_lng, dest_lat, dest_lng):
+    google_coordinates = []
+    for direction in response_data.get("directions", []):
+        for trip in direction.get("trips", []):
+            for step in trip.get("details", []):
+                gps = step.get("gps_coordinates")
+                if gps:
+                    google_coordinates.append((gps["latitude"], gps["longitude"]))
 
-    if not route_data.get("routes"):
-        st.warning("No route found.")
+    if not google_coordinates:
+        st.warning("No detailed route data available from Google Directions API.")
         return
-
-    coords = route_data["routes"][0]["geometry"]["coordinates"]
-    coords_latlng = [(lat, lng) for lng, lat in coords]
 
     midpoint = [(origin_lat + dest_lat) / 2, (origin_lng + dest_lng) / 2]
     m = folium.Map(location=midpoint, zoom_start=13)
 
     folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
     folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
-    folium.PolyLine(locations=coords_latlng, color="blue", weight=5).add_to(m)
+    folium.PolyLine(locations=google_coordinates, color="red", weight=5).add_to(m)
 
-    st.subheader("🛣 Real Road Route (OSRM)")
+    st.subheader("🛣 Google Directions Route")
     st_folium(m, width=700, height=500)
 
 expected_columns = {"Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"}
@@ -149,7 +150,12 @@ if expected_columns.issubset(filtered.columns):
         origin_lng = sample_row["Origin Lng"].values[0]
         dest_lat = sample_row["Destination Lat"].values[0]
         dest_lng = sample_row["Destination Lng"].values[0]
-        draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng)
+        # Make Google Directions API call here to get 'response_data'
+# Replace this with your actual SerpAPI response
+# For now using a placeholder empty structure
+response_data = {}  # <-- replace with actual response from SerpAPI
+
+draw_google_route_map(response_data, origin_lat, origin_lng, dest_lat, dest_lng)
 # Show average distance for the selected route
 distance_avg = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)]["Distance (km)"].mean()
 if not pd.isna(distance_avg):
