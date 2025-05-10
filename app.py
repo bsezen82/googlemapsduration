@@ -78,7 +78,6 @@ with col1:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
     st.markdown("---")
-    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
     # From Haram için günlük ortalama
     df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
@@ -107,18 +106,18 @@ with col2:
     st.altair_chart(chart, use_container_width=True)
     st.markdown("---")
     # Netleştirme: sadece gün bilgisi kalsın
-    df["Date"] = pd.to_datetime(df["Date"]).dt.date
+    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
     to_haram_daily = df[df["Destination Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
-    bar_chart_from = alt.Chart(to_haram_daily).mark_bar().encode(
+    bar_chart_to = alt.Chart(to_haram_daily).mark_bar().encode(
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
     ).properties(title="📊 To Mescid-i Haram - Daily Average Duration",height=400).mark_bar(size=50)
 
-    st.altair_chart(bar_chart_from, use_container_width=True)
+    st.altair_chart(bar_chart_to, use_container_width=True)
 
 # Route-specific comparison
 st.markdown("---")
