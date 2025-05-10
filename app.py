@@ -77,7 +77,7 @@ with col1:
         tooltip=["Hour", "Average Duration (min)", "Day"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
-st.markdown("---")
+    st.markdown("---")
     df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
     to_haram_daily = df[df["Destination Name"].str.lower().str.contains("haram")] \
@@ -102,7 +102,7 @@ with col2:
         tooltip=["Hour", "Average Duration (min)", "Day"]
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
-st.markdown("---")
+    st.markdown("---")
     # Netleştirme: sadece gün bilgisi kalsın
     df["Date"] = pd.to_datetime(df["Date"]).dt.date
 
