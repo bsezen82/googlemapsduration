@@ -173,7 +173,7 @@ def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
         folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
         folium.PolyLine(locations=coords_latlng, color="purple", weight=5, tooltip="OSRM Route").add_to(m)
 
-        st.subheader("🚣 Real Road Route (OSRM)")
+        st.subheader("🚣 Route Map")
         st_folium(m, width=500, height=300)
 
     except Exception as e:
