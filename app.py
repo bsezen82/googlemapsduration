@@ -2,26 +2,28 @@ import streamlit as st
 import pandas as pd
 import datetime
 import altair as alt
-import folium
-from streamlit_folium import st_folium
-import requests
 
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
-st.title("🙋 Hajj Travel Durations - Haram Focus")
+st.title("🕋 Hajj Period - Makkah Trafic Report")
 
-@st.cache_data
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
     df["Date"] = df["API Call Time"].dt.date
     df["Hour"] = df["API Call Time"].dt.strftime("%H:00")
+
     df["Duration (min)"] = df["Travel Duration"].apply(lambda x: round(float(x) / 60, 1) if pd.notnull(x) else None)
     df["Distance (km)"] = df["Distance"] / 1000
-    df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
-    df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
     return df
 
 df = load_data()
+
+# Split coordinates into numeric latitude and longitude
+# Assumes no missing values and proper formatting
+
+df[["Origin Lat", "Origin Lng"]] = df["Origin Coords"].str.split(",", expand=True).astype(float)
+df[["Destination Lat", "Destination Lng"]] = df["Destination Coords"].str.split(",", expand=True).astype(float)
+
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
@@ -31,13 +33,11 @@ df_yesterday = df[df["Date"] == yesterday]
 # FROM HARAM
 def prepare_line_data(df_source, label):
     from_haram = df_source[df_source["Origin Name"].str.lower().str.contains("haram")]
-    grouped = (
-        from_haram.groupby("Hour")
-        .apply(lambda g: pd.Series({
+    grouped = from_haram.groupby("Hour").apply(
+        lambda g: pd.Series({
             "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
-        }))
-        .reset_index()
-    )
+        })
+    ).reset_index()
     grouped["Day"] = label
     return grouped
 
@@ -50,13 +50,11 @@ from_haram_avg_distance = df_today[df_today["Origin Name"].str.lower().str.conta
 # TO HARAM
 def prepare_line_data_to(df_source, label):
     to_haram = df_source[df_source["Destination Name"].str.lower().str.contains("haram")]
-    grouped = (
-        to_haram.groupby("Hour")
-        .apply(lambda g: pd.Series({
+    grouped = to_haram.groupby("Hour").apply(
+        lambda g: pd.Series({
             "Average Duration (min)": (g["Duration (min)"] * g["Distance (km)"].fillna(0)).sum() / g["Distance (km)"].fillna(0).sum()
-        }))
-        .reset_index()
-    )
+        })
+    ).reset_index()
     grouped["Day"] = label
     return grouped
 
@@ -70,7 +68,6 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f"⬅️ From Mescid-i Haram (avg. {from_haram_avg_distance:.1f} km)")
-st.caption("(Includes routes from: Al Aziziyah, Al Awali, Al Naseem, Kudai, Al Misfalah)")
     st.metric("Average Duration (min)", f"{from_haram_overall:.1f}" if from_haram_overall else "N/A")
     chart = alt.Chart(from_haram_combined).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(from_haram_combined["Hour"].unique())),
@@ -80,18 +77,8 @@ st.caption("(Includes routes from: Al Aziziyah, Al Awali, Al Naseem, Kudai, Al M
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-    # Daily average duration bar chart for From Haram
-    from_daily_avg = df[df["Origin Name"].str.lower().str.contains("haram")].groupby("Date")["Duration (min)"].mean().reset_index()
-    from_bar = alt.Chart(from_daily_avg).mark_bar().encode(
-        x=alt.X("Date:T", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(height=200, title="Daily Avg Duration - From Haram")
-    st.altair_chart(from_bar, use_container_width=True)
-
 with col2:
     st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
-st.caption("(Includes routes to: Al Aziziyah, Al Awali, Al Naseem, Kudai, Al Misfalah)")
     st.metric("Average Duration (min)", f"{to_haram_overall:.1f}" if to_haram_overall else "N/A")
     chart = alt.Chart(to_haram_combined).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(to_haram_combined["Hour"].unique())),
@@ -101,25 +88,17 @@ st.caption("(Includes routes to: Al Aziziyah, Al Awali, Al Naseem, Kudai, Al Mis
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-    # Daily average duration bar chart for To Haram
-    to_daily_avg = df[df["Destination Name"].str.lower().str.contains("haram")].groupby("Date")["Duration (min)"].mean().reset_index()
-    to_bar = alt.Chart(to_daily_avg).mark_bar().encode(
-        x=alt.X("Date:T", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(height=200, title="Daily Avg Duration - To Haram")
-    st.altair_chart(to_bar, use_container_width=True)
-
 # Route-specific comparison
 st.markdown("---")
 st.header("📍 Route-Specific Comparison")
 route_df = df[df["Date"].isin([today, yesterday])].copy()
 from_options = sorted(route_df["Origin Name"].dropna().unique())
-selected_from = st.selectbox("Select Origin (Route Filter)", from_options, key="route_origin")
+selected_from = st.selectbox("Select Origin", from_options, key="route_origin")
 
 filtered_df = route_df[route_df["Origin Name"] == selected_from]
 to_options = sorted(filtered_df["Destination Name"].dropna().unique())
-selected_to = st.selectbox("Select Destination (Route Filter)", to_options, key="route_destination")
+
+selected_to = st.selectbox("Select Destination", to_options, key="route_destination")
 
 filtered = route_df[(route_df["Origin Name"] == selected_from) & (route_df["Destination Name"] == selected_to)]
 
@@ -135,10 +114,10 @@ route_chart = alt.Chart(grouped).mark_line(point=True).encode(
 
 st.altair_chart(route_chart, use_container_width=True)
 
-# Show average distance for the selected route
-distance_avg = filtered[(filtered["Origin Name"] == selected_from) & (filtered["Destination Name"] == selected_to)]["Distance (km)"].mean()
-if not pd.isna(distance_avg):
-    st.write(f"**Average Distance:** {distance_avg:.2f} km")
+# 🛣 Real road route (OSRM)
+import folium
+from streamlit_folium import st_folium
+import requests
 
 # 🗺️ Map View with route and OSRM polyline
 def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
@@ -163,16 +142,6 @@ def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
 
         st.subheader("🚣 Real Road Route (OSRM)")
         st_folium(m, width=700, height=500)
-
-    # Daily average duration bar chart for selected route
-    st.subheader("📊 Daily Avg Duration - Selected Route")
-    route_avg = filtered.groupby("Date")["Duration (min)"].mean().reset_index()
-    route_bar = alt.Chart(route_avg).mark_bar().encode(
-        x=alt.X("Date:T", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(height=300)
-    st.altair_chart(route_bar, use_container_width=True)
 
     except Exception as e:
         st.warning(f"OSRM route could not be displayed: {e}")
