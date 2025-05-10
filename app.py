@@ -87,7 +87,7 @@ with col1:
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
-    ).properties(height=200)
+    ).properties(title="📊 To Al Haram - Daily Average Duration",height=200)
 
     st.altair_chart(bar_chart_from, use_container_width=True)
   
@@ -116,7 +116,7 @@ with col2:
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
-    ).properties(height=200)
+    ).properties(title="📊 From Al Haram - Daily Average Duration", height=200)
 
     st.altair_chart(bar_chart_from, use_container_width=True)
 
