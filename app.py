@@ -67,7 +67,7 @@ to_haram_avg_distance = df_today[df_today["Destination Name"].str.lower().str.co
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader(f"⬅️ From Haram (avg. {from_haram_avg_distance:.1f} km)")
+    st.subheader(f"⬅️ From Mescid-i Haram (avg. {from_haram_avg_distance:.1f} km)")
     st.metric("Average Duration (min)", f"{from_haram_overall:.1f}" if from_haram_overall else "N/A")
     chart = alt.Chart(from_haram_combined).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(from_haram_combined["Hour"].unique())),
@@ -78,7 +78,7 @@ with col1:
     st.altair_chart(chart, use_container_width=True)
 
 with col2:
-    st.subheader(f"➡️ To Haram (avg. {to_haram_avg_distance:.1f} km)")
+    st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
     st.metric("Average Duration (min)", f"{to_haram_overall:.1f}" if to_haram_overall else "N/A")
     chart = alt.Chart(to_haram_combined).mark_line(point=True).encode(
         x=alt.X("Hour", sort=list(to_haram_combined["Hour"].unique())),
