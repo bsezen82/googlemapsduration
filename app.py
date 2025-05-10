@@ -78,6 +78,15 @@ with col1:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
+    # Daily average duration bar chart for From Haram
+    from_daily_avg = df[df["Origin Name"].str.lower().str.contains("haram")].groupby("Date")["Duration (min)"].mean().reset_index()
+    from_bar = alt.Chart(from_daily_avg).mark_bar().encode(
+        x=alt.X("Date:T", title="Date"),
+        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
+        tooltip=["Date", "Duration (min)"]
+    ).properties(height=200, title="Daily Avg Duration - From Al Haram")
+    st.altair_chart(from_bar, use_container_width=True)
+
 with col2:
     st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
     st.caption("(Includes routes from: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai)")
