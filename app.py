@@ -114,29 +114,42 @@ route_chart = alt.Chart(grouped).mark_line(point=True).encode(
 
 st.altair_chart(route_chart, use_container_width=True)
 
-import requests
+# 🛣 Real road route (OSRM)
 import folium
 from streamlit_folium import st_folium
+import requests
 
-# OSRM rota çizimi
+# 🗺️ Map View with route and OSRM polyline
 def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
-    url = f"http://router.project-osrm.org/route/v1/driving/{origin_lng},{origin_lat};{dest_lng},{dest_lat}?overview=full&geometries=geojson"
-    response = requests.get(url)
-    route_data = response.json()
+    try:
+        url = f"http://router.project-osrm.org/route/v1/driving/{origin_lng},{origin_lat};{dest_lng},{dest_lat}?overview=full&geometries=geojson"
+        response = requests.get(url)
+        route_data = response.json()
 
-    if not route_data.get("routes"):
-        st.warning("No route found.")
-        return
+        if not route_data.get("routes"):
+            st.warning("No OSRM route found.")
+            return
 
-    coords = route_data["routes"][0]["geometry"]["coordinates"]
-    coords_latlng = [(lat, lng) for lng, lat in coords]  # reverse for folium
+        coords = route_data["routes"][0]["geometry"]["coordinates"]
+        coords_latlng = [(lat, lng) for lng, lat in coords]
 
-    midpoint = [(origin_lat + dest_lat) / 2, (origin_lng + dest_lng) / 2]
-    m = folium.Map(location=midpoint, zoom_start=13)
+        midpoint = [(origin_lat + dest_lat) / 2, (origin_lng + dest_lng) / 2]
+        m = folium.Map(location=midpoint, zoom_start=13)
 
-    folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
-    folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
-    folium.PolyLine(locations=coords_latlng, color="blue", weight=5).add_to(m)
+        folium.Marker([origin_lat, origin_lng], tooltip="Origin", icon=folium.Icon(color='green')).add_to(m)
+        folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
+        folium.PolyLine(locations=coords_latlng, color="purple", weight=5, tooltip="OSRM Route").add_to(m)
 
-    st.subheader("🛣 Real Road Route (OSRM)")
-    st_folium(m, width=500, height=300)
+        st.subheader("🚣 Real Road Route (OSRM)")
+        st_folium(m, width=700, height=500)
+
+    except Exception as e:
+        st.warning(f"OSRM route could not be displayed: {e}")
+
+sample_row = filtered.dropna(subset=["Origin Lat", "Origin Lng", "Destination Lat", "Destination Lng"]).head(1)
+if not sample_row.empty:
+    origin_lat = sample_row["Origin Lat"].values[0]
+    origin_lng = sample_row["Origin Lng"].values[0]
+    dest_lat = sample_row["Destination Lat"].values[0]
+    dest_lng = sample_row["Destination Lng"].values[0]
+    draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng)
