@@ -78,15 +78,19 @@ with col1:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-    # Daily average duration bar chart for To Haram
-    to_daily_avg = df[df["Destination Name"].str.lower().str.contains("haram")].groupby("Date")["Duration (min)"].mean().reset_index()
-    to_bar = alt.Chart(to_daily_avg).mark_bar().encode(
-        x=alt.X("Date:T", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(height=200, title="Daily Avg Duration - To Haram")
-    st.altair_chart(to_bar, use_container_width=True)
-    
+    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
+
+to_haram_daily = df[df["Destination Name"].str.lower().str.contains("haram")] \
+    .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
+
+bar_chart_from = alt.Chart(to_haram_daily).mark_bar().encode(
+    x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
+    y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
+    tooltip=["Date", "Average Duration (min)"]
+).properties(height=200)
+
+st.altair_chart(bar_chart_from, use_container_width=True)
+  
 with col2:
     st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
     st.caption("(Includes routes from: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai)")
