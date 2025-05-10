@@ -4,7 +4,7 @@ import datetime
 import altair as alt
 
 st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
-st.title("🕋 Hajj Travel Durations - Haram Focus")
+st.title("🕋 Hajj Period - Makkah Trafic Report")
 
 def load_data():
     df = pd.read_csv("travel_durations.csv")
