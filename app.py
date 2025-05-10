@@ -80,9 +80,10 @@ with col1:
     st.markdown("---")
 
     # From Haram için günlük ortalama
-    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
+    df_bar = df.copy()
+    df_bar["Date"] = pd.to_datetime(df_bar["Date"]).dt.strftime("%Y-%m-%d")
 
-    from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
+    from_haram_daily = df_bar[df_bar["Origin Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
     bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
