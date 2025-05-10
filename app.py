@@ -116,7 +116,7 @@ with col2:
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
-    ).properties(title="📊 From Al Haram - Daily Average Duration", height=300).mark_bar(size=50)
+    ).properties(title="📊 From Al Haram - Daily Average Duration", height=400).mark_bar(size=50)
 
     st.altair_chart(bar_chart_from, use_container_width=True)
 
@@ -143,7 +143,7 @@ route_chart = alt.Chart(grouped).mark_line(point=True).encode(
     y="Duration (min)",
     color="Day",
     tooltip=["Hour", "Duration (min)", "Day"]
-).properties(height=300)
+).properties(height=400)
 
 st.altair_chart(route_chart, use_container_width=True)
 
