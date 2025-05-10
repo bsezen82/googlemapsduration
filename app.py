@@ -99,6 +99,10 @@ with col2:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
+# Netleştirme: sadece gün bilgisi kalsın
+df["Date"] = pd.to_datetime(df["Date"]).dt.date
+
+# From Haram için günlük ortalama
 from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
