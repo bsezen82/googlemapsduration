@@ -99,6 +99,18 @@ with col2:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
+from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
+    .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
+
+bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
+    x=alt.X("Date:T", title="Date", axis=alt.Axis(format="%Y-%m-%d")),
+    y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
+    tooltip=["Date", "Average Duration (min)"]
+).properties(height=200)
+
+st.altair_chart(bar_chart_from, use_container_width=True)
+
+
 # Route-specific comparison
 st.markdown("---")
 st.header("📍 Route-Specific Comparison")
