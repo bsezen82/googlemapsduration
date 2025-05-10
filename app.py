@@ -187,3 +187,17 @@ if not sample_row.empty:
     dest_lng = sample_row["Destination Lng"].values[0]
     draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng)
 
+    df_bar_filtered = filtered.copy()
+    df_bar_filtered["Date"] = pd.to_datetime(df_bar_filtered["Date"]).dt.strftime("%Y-%m-%d")
+
+    from_haram_daily = df_bar_filtered[df_bar["Origin Name"].str.lower().str.contains("haram")] \
+    .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
+
+    bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
+    x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
+    y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
+    tooltip=["Date", "Average Duration (min)"]
+    ).properties(title="📊 From Mescid-i Haram - Daily Average Duration", height=400).mark_bar(size=50)
+
+    st.altair_chart(bar_chart_from, use_container_width=True)
+
