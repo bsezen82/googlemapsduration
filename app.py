@@ -103,11 +103,13 @@ with col2:
 df["Date"] = pd.to_datetime(df["Date"]).dt.date
 
 # From Haram için günlük ortalama
+df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
+
 from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
 bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
-    x=alt.X("Date:T", title="Date", axis=alt.Axis(format="%Y-%m-%d")),
+    x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
 ).properties(height=200)
