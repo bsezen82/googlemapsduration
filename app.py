@@ -80,16 +80,16 @@ with col1:
 
     df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
-to_haram_daily = df[df["Destination Name"].str.lower().str.contains("haram")] \
+    to_haram_daily = df[df["Destination Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
-bar_chart_from = alt.Chart(to_haram_daily).mark_bar().encode(
+    bar_chart_from = alt.Chart(to_haram_daily).mark_bar().encode(
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
-).properties(height=200)
+    ).properties(height=200)
 
-st.altair_chart(bar_chart_from, use_container_width=True)
+    st.altair_chart(bar_chart_from, use_container_width=True)
   
 with col2:
     st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
@@ -103,22 +103,22 @@ with col2:
     ).properties(height=300)
     st.altair_chart(chart, use_container_width=True)
 
-# Netleştirme: sadece gün bilgisi kalsın
-df["Date"] = pd.to_datetime(df["Date"]).dt.date
+    # Netleştirme: sadece gün bilgisi kalsın
+    df["Date"] = pd.to_datetime(df["Date"]).dt.date
 
-# From Haram için günlük ortalama
-df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
+    # From Haram için günlük ortalama
+    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
-from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
+    from_haram_daily = df[df["Origin Name"].str.lower().str.contains("haram")] \
     .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
 
-bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
+    bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
     x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
     y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
     tooltip=["Date", "Average Duration (min)"]
-).properties(height=200)
+    ).properties(height=200)
 
-st.altair_chart(bar_chart_from, use_container_width=True)
+    st.altair_chart(bar_chart_from, use_container_width=True)
 
 
 # Route-specific comparison
