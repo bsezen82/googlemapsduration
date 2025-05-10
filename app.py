@@ -153,7 +153,7 @@ from streamlit_folium import st_folium
 import requests
 
 # 🗺️ Map View with route and OSRM polyline
-def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng, filtered):
+def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng):
     try:
         url = f"http://router.project-osrm.org/route/v1/driving/{origin_lng},{origin_lat};{dest_lng},{dest_lat}?overview=full&geometries=geojson"
         response = requests.get(url)
@@ -173,54 +173,8 @@ def draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng, filtered):
         folium.Marker([dest_lat, dest_lng], tooltip="Destination", icon=folium.Icon(color='red')).add_to(m)
         folium.PolyLine(locations=coords_latlng, color="purple", weight=5, tooltip="OSRM Route").add_to(m)
 
-    except Exception as e:
-        st.warning(f"OSRM route could not be displayed: {e}")
-        m = folium.Map(location=[origin_lat, origin_lng], zoom_start=13)
-
-    map_col, chart_col = st.columns([2, 1])
-
-    with map_col:
-        st.subheader("🗺️ Map View")
-        st_folium(m, width=700, height=500)
-
-    with chart_col:
-        route_daily = filtered.groupby("Date")["Duration (min)"].mean().reset_index()
-        route_daily["Date"] = pd.to_datetime(route_daily["Date"]).dt.strftime("%Y-%m-%d")
-
-        route_bar_chart = alt.Chart(route_daily).mark_bar(size=15).encode(
-            x=alt.X("Date:O", title="Date"),
-            y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-            tooltip=["Date", "Duration (min)"]
-        ).properties(
-            height=300,
-            title="📊 Daily Avg Duration for Selected Route"
-        )
-        st.altair_chart(route_bar_chart, use_container_width=True)
-
-with chart_col:
-    # Daily average duration for selected route
-    route_daily = filtered.groupby("Date")["Duration (min)"].mean().reset_index()
-    route_daily["Date"] = pd.to_datetime(route_daily["Date"]).dt.strftime("%Y-%m-%d")
-
-    route_bar_chart = alt.Chart(route_daily).mark_bar(size=15).encode(
-        x=alt.X("Date:O", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(
-        height=300,
-        title="📊 Daily Avg Duration for Selected Route"
-    )
-    st.altair_chart(route_bar_chart, use_container_width=True)
-
-    # Daily average duration bar chart for selected route
-    st.subheader("📊 Daily Avg Duration - Selected Route")
-    route_avg = filtered.groupby("Date")["Duration (min)"].mean().reset_index()
-    route_bar = alt.Chart(route_avg).mark_bar().encode(
-        x=alt.X("Date:T", title="Date"),
-        y=alt.Y("Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Duration (min)"]
-    ).properties(height=300)
-    st.altair_chart(route_bar, use_container_width=True)
+        st.subheader("🚣 Route Map")
+        st_folium(m, width=500, height=300)
 
     except Exception as e:
         st.warning(f"OSRM route could not be displayed: {e}")
@@ -231,5 +185,5 @@ if not sample_row.empty:
     origin_lng = sample_row["Origin Lng"].values[0]
     dest_lat = sample_row["Destination Lat"].values[0]
     dest_lng = sample_row["Destination Lng"].values[0]
-    draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng, filtered)
+    draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng)
 
