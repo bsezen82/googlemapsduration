@@ -2,6 +2,7 @@ from apify_client import ApifyClient
 import pandas as pd
 import time
 from datetime import datetime, timedelta
+import os
 
 yesterday = (datetime.utcnow() + timedelta(hours=3) - timedelta(days=1)).strftime("%Y-%m-%d")
 
