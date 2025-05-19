@@ -1,0 +1,38 @@
+name: Run Apify Review Scraper
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # UTC 22:00 → UTC+3 = 01:00
+  workflow_dispatch:
+
+jobs:
+  scrape-reviews:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run review scraper
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: |
+          python apify_reviews_scraper.py
+
+      - name: Commit updated CSV
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Makkah_Hajj_Reviews_Apify.csv
+          git commit -m "Update reviews [skip ci]" || echo "No changes"
+          git push
