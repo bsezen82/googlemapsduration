@@ -12,7 +12,7 @@ MAX_REVIEWS = 200
 SLEEP_SECONDS = 10
 # ==================
 
-df_places = pd.read_excel("Traffic_Locations.xlsx")
+df_places = pd.read_excel("Makkah_Attractions.xlsx")
 
 
 # 1. Apify client başlat
