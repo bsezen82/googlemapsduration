@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 yesterday = (datetime.utcnow() + timedelta(hours=3) - timedelta(days=1)).strftime("%Y-%m-%d")
 
-API_TOKEN = "apify_api_sgit3voHI4ghw1p9AhKIUG8bwnkFNt11ViD7" 
+API_TOKEN = os.getenv('APIFY_TOKEN') 
 REVIEWS_START_DATE = yesterday
 MAX_REVIEWS = 200
 SLEEP_SECONDS = 10
