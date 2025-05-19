@@ -33,6 +33,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add makkah_reviews_from_apify.csv
+          git add Makkah_Hajj_Reviews_Apify.csv
           git commit -m "Update reviews [skip ci]" || echo "No changes"
           git push
