@@ -54,7 +54,8 @@ for _, row in df_places.iterrows():
         print(f"❌ Hata oluştu {place_name} için: {e}")
         time.sleep(5)
 
-# DataFrame ve CSV
 df_all = pd.DataFrame(all_rows)
-df_all.to_csv(OUTPUT_CSV, index=False)
-print(f"\n📁 Full veri kaydedildi: {OUTPUT_CSV}")
+if not df_all.empty:
+    df_all.to_csv(("Makkah_Hajj_Reviews_Apify.csv"), mode='a', index=False, header=not pd.io.common.file_exists("Makkah_Hajj_Reviews_Apify.csv"))
+else:
+    print("ℹ️ Yeni yorum bulunamadı.")
