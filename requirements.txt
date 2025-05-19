@@ -5,3 +5,4 @@ streamlit
 altair
 folium
 streamlit-folium
+apify-client
