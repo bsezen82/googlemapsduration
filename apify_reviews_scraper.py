@@ -3,15 +3,15 @@ import pandas as pd
 import time
 from datetime import datetime, timedelta
 
-EXCEL_PATH = "/Users/boras/desktop/boras/Hajj_Analysis/Makkah_Attractions.xlsx" 
-OUTPUT_CSV = "/Users/boras/desktop/boras/Hajj_Analysis/Makkah_Hajj_Reviews_Apify.csv" 
+yesterday = (datetime.utcnow() + timedelta(hours=3) - timedelta(days=1)).strftime("%Y-%m-%d")
+
 API_TOKEN = "apify_api_sgit3voHI4ghw1p9AhKIUG8bwnkFNt11ViD7" 
-REVIEWS_START_DATE = "2025-04-29"
-MAX_REVIEWS = 2000
+REVIEWS_START_DATE = yesterday
+MAX_REVIEWS = 200
 SLEEP_SECONDS = 10
 # ==================
 
-df_places = pd.read_excel(EXCEL_PATH)
+df_places = pd.read_excel("Traffic_Locations.xlsx")
 
 
 # 1. Apify client başlat
