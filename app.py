@@ -74,58 +74,53 @@ if page == "Traffic Trends":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader(f"⬅️ From Mescid-i Haram (avg. {from_haram_avg_distance:.1f} km)")
+        st.subheader(f"⬅️ From Masjid al-Haram (avg. {from_avg_distance:.1f} km)")
         st.caption("(Includes routes to: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai))")
-        st.metric("Average Duration (min)", f"{from_haram_overall:.1f}" if from_haram_overall else "N/A")
-        chart = alt.Chart(from_haram_combined).mark_line(point=True).encode(
-            x=alt.X("Hour", sort=list(from_haram_combined["Hour"].unique())),
+        st.metric("Average Duration (min)", f"{from_overall:.1f}" if from_overall else "N/A")
+        chart = alt.Chart(from_combined).mark_line(point=True).encode(
+            x=alt.X("Hour", sort=list(from_combined["Hour"].unique())),
             y="Average Duration (min)",
             color="Day",
             tooltip=["Hour", "Average Duration (min)", "Day"]
         ).properties(height=300)
         st.altair_chart(chart, use_container_width=True)
-        st.markdown("---")
-    
-        # From Haram için günlük ortalama
+
         df_bar = df.copy()
         df_bar["Date"] = pd.to_datetime(df_bar["Date"]).dt.strftime("%Y-%m-%d")
-    
         from_haram_daily = df_bar[df_bar["Origin Name"].str.lower().str.contains("haram")] \
-        .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
-    
-        bar_chart_from = alt.Chart(from_haram_daily).mark_bar().encode(
-        x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
-        y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Average Duration (min)"]
-        ).properties(title="📊 From Mescid-i Haram - Daily Average Duration", height=400).mark_bar(size=50)
-    
+            .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
+
+        bar_chart_from = alt.Chart(from_haram_daily).mark_line(point=True).encode(
+            x=alt.X("Date:O", title="Date"),
+            y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
+            tooltip=["Date", "Average Duration (min)"]
+        ).properties(title="📊 From Masjid al-Haram - Daily Average Duration", height=400)
+
         st.altair_chart(bar_chart_from, use_container_width=True)
-      
+
     with col2:
-        st.subheader(f"➡️ To Mescid-i Haram (avg. {to_haram_avg_distance:.1f} km)")
+        st.subheader(f"➡️ To Masjid al-Haram (avg. {to_avg_distance:.1f} km)")
         st.caption("(Includes routes from: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai)")
-        st.metric("Average Duration (min)", f"{to_haram_overall:.1f}" if to_haram_overall else "N/A")
-        chart = alt.Chart(to_haram_combined).mark_line(point=True).encode(
-            x=alt.X("Hour", sort=list(to_haram_combined["Hour"].unique())),
+        st.metric("Average Duration (min)", f"{to_overall:.1f}" if to_overall else "N/A")
+        chart = alt.Chart(to_combined).mark_line(point=True).encode(
+            x=alt.X("Hour", sort=list(to_combined["Hour"].unique())),
             y="Average Duration (min)",
             color="Day",
             tooltip=["Hour", "Average Duration (min)", "Day"]
         ).properties(height=300)
         st.altair_chart(chart, use_container_width=True)
-        st.markdown("---")
-        # Netleştirme: sadece gün bilgisi kalsın
+
         df_bar = df.copy()
         df_bar["Date"] = pd.to_datetime(df_bar["Date"]).dt.strftime("%Y-%m-%d")
-    
         to_haram_daily = df_bar[df_bar["Destination Name"].str.lower().str.contains("haram")] \
-        .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
-    
-        bar_chart_to = alt.Chart(to_haram_daily).mark_bar().encode(
-        x=alt.X("Date:O", title="Date"),  # use ordinal for categorical days
-        y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
-        tooltip=["Date", "Average Duration (min)"]
-        ).properties(title="📊 To Mescid-i Haram - Daily Average Duration",height=400).mark_bar(size=50)
-    
+            .groupby("Date")["Duration (min)"].mean().reset_index(name="Average Duration (min)")
+
+        bar_chart_to = alt.Chart(to_haram_daily).mark_line(point=True).encode(
+            x=alt.X("Date:O", title="Date"),
+            y=alt.Y("Average Duration (min)", title="Avg Duration (min)"),
+            tooltip=["Date", "Average Duration (min)"]
+        ).properties(title="📊 To Masjid al-Haram - Daily Average Duration", height=400)
+
         st.altair_chart(bar_chart_to, use_container_width=True)
     
     # Route-specific comparison
