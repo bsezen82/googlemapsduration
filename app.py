@@ -264,6 +264,7 @@ elif page == "Review Trends":
 
     # Son 3 günü al
     # 4️⃣ 1–2 Star Reviews Table
+    
     st.markdown("---")
     st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
 
