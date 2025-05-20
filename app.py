@@ -249,8 +249,32 @@ elif page == "Review Trends":
     st.altair_chart(chart, use_container_width=True)
 
     # 1-2 Star Reviews from Yesterday
-    st.subheader("❗ 1-2-3 Star Reviews from Yesterday")
-    low_star_reviews = df_yesterday[df_yesterday["stars"].isin([1, 2, 3])][[
-        "place_name", "category", "textTranslated", "stars"]]
-
-    st.dataframe(low_star_reviews, use_container_width=True)
+    st.markdown("---")
+    st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
+    
+    # Tarihi datetime objesine çevir
+    df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
+    
+    # Son 3 günü al
+    last_3_days = datetime.now().date() - timedelta(days=3)
+    low_reviews = df[
+        (df["stars"].isin([1, 2])) &
+        (df["publishedAt"].dt.date >= last_3_days) &
+        (df["textTranslated"].notna())
+    ].copy()
+    
+    # Tarih biçimlendir
+    low_reviews["publishedAtFormatted"] = low_reviews["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
+    
+    # Yeniden eskiye sırala
+    low_reviews = low_reviews.sort_values("publishedAt", ascending=False)
+    
+    # Sadece belirli alanları göster
+    display_cols = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
+    st.dataframe(low_reviews[display_cols].rename(columns={
+        "publishedAtFormatted": "Date",
+        "place_name": "Place",
+        "category": "Category",
+        "textTranslated": "Review",
+        "stars": "Rating"
+    }), use_container_width=True)
