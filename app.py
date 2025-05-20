@@ -3,7 +3,6 @@ import pandas as pd
 import datetime
 import altair as alt
 from datetime import timedelta
-from datetime import datetime, timedelta
 
 
 st.set_page_config(page_title="Hajj Dashboard", layout="wide")
