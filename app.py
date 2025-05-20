@@ -76,9 +76,9 @@ if page == "Traffic Trends":
     with col1:
         st.subheader(f"⬅️ From Masjid al-Haram (avg. {from_haram_avg_distance:.1f} km)")
         st.caption("(Includes routes to: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai))")
-        st.metric("Average Duration (min)", f"{from_overall:.1f}" if from_overall else "N/A")
-        chart = alt.Chart(from_combined).mark_line(point=True).encode(
-            x=alt.X("Hour", sort=list(from_combined["Hour"].unique())),
+        st.metric("Average Duration (min)", f"{from_overall:.1f}" if from_haram_overall else "N/A")
+        chart = alt.Chart(from_haram_combined).mark_line(point=True).encode(
+            x=alt.X("Hour", sort=list(from_haram_combined["Hour"].unique())),
             y="Average Duration (min)",
             color="Day",
             tooltip=["Hour", "Average Duration (min)", "Day"]
@@ -101,9 +101,9 @@ if page == "Traffic Trends":
     with col2:
         st.subheader(f"➡️ To Masjid al-Haram (avg. {to_haram_avg_distance:.1f} km)")
         st.caption("(Includes routes from: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai)")
-        st.metric("Average Duration (min)", f"{to_overall:.1f}" if to_overall else "N/A")
-        chart = alt.Chart(to_combined).mark_line(point=True).encode(
-            x=alt.X("Hour", sort=list(to_combined["Hour"].unique())),
+        st.metric("Average Duration (min)", f"{to_haram_overall:.1f}" if to_overall else "N/A")
+        chart = alt.Chart(to_haram_combined).mark_line(point=True).encode(
+            x=alt.X("Hour", sort=list(to_haram_combined["Hour"].unique())),
             y="Average Duration (min)",
             color="Day",
             tooltip=["Hour", "Average Duration (min)", "Day"]
