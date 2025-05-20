@@ -213,39 +213,54 @@ elif page == "Review Trends":
     count_yesterday = len(df_yesterday)
     count_day_before = len(df_day_before)
 
-    st.subheader("⭐️ Average Ratings Overview")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Yesterday", f"{mean_yesterday:.2f}" if not pd.isna(mean_yesterday) else "–")
-    col2.metric("Previous Day", f"{mean_day_before:.2f}" if not pd.isna(mean_day_before) else "–")
-    col3.metric("Overall (Hajj Period)", f"{mean_all:.2f}" if not pd.isna(mean_all) else "–")
+def display_metrics_block(title, df, yesterday, day_before, category=None):
+    if category:
+        df = df[df["category"] == category]
 
-    # Category-wise averages
-    st.subheader("📊 Ratings by Category")
-    categories = df["category"].dropna().unique()
-    cat_avg = df.groupby("category")["stars"].mean().reset_index()
-    st.dataframe(cat_avg, use_container_width=True)
+    st.subheader(title)
+
+    # Ratings
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Avg Rating (Yesterday)", f"{df[df['date'] == yesterday]['stars'].mean():.2f}" if not df[df['date'] == yesterday].empty else "—")
+    col2.metric("Avg Rating (Previous Day)", f"{df[df['date'] == day_before]['stars'].mean():.2f}" if not df[df['date'] == day_before].empty else "—")
+    col3.metric("Avg Rating (Overall)", f"{df['stars'].mean():.2f}" if not df.empty else "—")
 
     # Review counts
-    st.subheader("🧮 Review Counts")
     col4, col5, col6 = st.columns(3)
-    col4.metric("Yesterday", count_yesterday)
-    col5.metric("Previous Day", count_day_before)
-    col6.metric("Overall", count_all)
+    col4.metric("Review Count (Yesterday)", len(df[df["date"] == yesterday]))
+    col5.metric("Review Count (Previous Day)", len(df[df["date"] == day_before]))
+    col6.metric("Review Count (Overall)", len(df))
 
-    # Daily trend with filter
+    # 1️⃣ OVERALL
+    display_metrics_block("⭐ Overall", df, yesterday, day_before)
+    
+    # 2️⃣ CATEGORY-WISE
+    for cat in ["Cafes & Restaurants", "Hotels", "Masjid al-Haram", "Mosques & Religious Places"]:
+        display_metrics_block(f"🏷 {cat}", df, yesterday, day_before, category=cat)
+    
+    # 3️⃣ Filtered Trend Chart
+    st.markdown("---")
     st.subheader("📈 Daily Average Rating Trend")
-    category_filter = st.selectbox("Filter by Category", ["All"] + list(categories))
-    trend_df = df.copy()
-    if category_filter != "All":
-        trend_df = trend_df[trend_df["category"] == category_filter]
-
-    daily_avg = trend_df.groupby("date")["stars"].mean().reset_index()
+    
+    category_options = ["All"] + sorted(df["category"].dropna().unique())
+    selected_category = st.selectbox("Filter by Category", category_options)
+    
+    if selected_category != "All":
+        df_filtered = df[df["category"] == selected_category]
+    else:
+        df_filtered = df
+    
+    daily_avg = df_filtered.groupby("date")["stars"].mean().reset_index()
+    
     chart = alt.Chart(daily_avg).mark_line(point=True).encode(
         x=alt.X("date:T", title="Date"),
         y=alt.Y("stars:Q", title="Average Rating"),
         tooltip=["date", "stars"]
-    ).properties(height=300)
-
+    ).properties(
+        width=700,
+        height=300
+    )
+    
     st.altair_chart(chart, use_container_width=True)
 
     # 1-2 Star Reviews from Yesterday
