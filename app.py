@@ -256,7 +256,7 @@ elif page == "Review Trends":
     df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
     
     # Son 3 günü al
-    last_3_days = datetime.now().date() - timedelta(days=3)
+    last_3_days = datetime.datetime.now().date() - timedelta(days=3)
     low_reviews = df[
         (df["stars"].isin([1, 2])) &
         (df["publishedAt"].dt.date >= last_3_days) &
