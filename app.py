@@ -213,45 +213,45 @@ elif page == "Review Trends":
     count_yesterday = len(df_yesterday)
     count_day_before = len(df_day_before)
 
-def display_metrics_block(title, df, yesterday, day_before, category=None):
-    if category:
-        df = df[df["category"] == category]
-
-    st.subheader(title)
-
-    # Ratings
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Avg Rating (Yesterday)", f"{df[df['date'] == yesterday]['stars'].mean():.2f}" if not df[df['date'] == yesterday].empty else "—")
-    col2.metric("Avg Rating (Previous Day)", f"{df[df['date'] == day_before]['stars'].mean():.2f}" if not df[df['date'] == day_before].empty else "—")
-    col3.metric("Avg Rating (Overall)", f"{df['stars'].mean():.2f}" if not df.empty else "—")
-
-    # Review counts
-    col4, col5, col6 = st.columns(3)
-    col4.metric("Review Count (Yesterday)", len(df[df["date"] == yesterday]))
-    col5.metric("Review Count (Previous Day)", len(df[df["date"] == day_before]))
-    col6.metric("Review Count (Overall)", len(df))
+    def display_metrics_block(title, df, yesterday, day_before, category=None):
+        if category:
+            df = df[df["category"] == category]
+    
+        st.subheader(title)
+    
+        # Ratings
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Avg Rating (Yesterday)", f"{df[df['date'] == yesterday]['stars'].mean():.2f}" if not df[df['date'] == yesterday].empty else "—")
+        col2.metric("Avg Rating (Previous Day)", f"{df[df['date'] == day_before]['stars'].mean():.2f}" if not df[df['date'] == day_before].empty else "—")
+        col3.metric("Avg Rating (Overall)", f"{df['stars'].mean():.2f}" if not df.empty else "—")
+    
+        # Review counts
+        col4, col5, col6 = st.columns(3)
+        col4.metric("Review Count (Yesterday)", len(df[df["date"] == yesterday]))
+        col5.metric("Review Count (Previous Day)", len(df[df["date"] == day_before]))
+        col6.metric("Review Count (Overall)", len(df))
 
     # 1️⃣ OVERALL
     display_metrics_block("⭐ Overall", df, yesterday, day_before)
-    
+
     # 2️⃣ CATEGORY-WISE
     for cat in ["Cafes & Restaurants", "Hotels", "Masjid al-Haram", "Mosques & Religious Places"]:
         display_metrics_block(f"🏷 {cat}", df, yesterday, day_before, category=cat)
-    
+
     # 3️⃣ Filtered Trend Chart
     st.markdown("---")
     st.subheader("📈 Daily Average Rating Trend")
-    
+
     category_options = ["All"] + sorted(df["category"].dropna().unique())
     selected_category = st.selectbox("Filter by Category", category_options)
-    
+
     if selected_category != "All":
         df_filtered = df[df["category"] == selected_category]
     else:
         df_filtered = df
-    
+
     daily_avg = df_filtered.groupby("date")["stars"].mean().reset_index()
-    
+
     chart = alt.Chart(daily_avg).mark_line(point=True).encode(
         x=alt.X("date:T", title="Date"),
         y=alt.Y("stars:Q", title="Average Rating"),
@@ -260,15 +260,15 @@ def display_metrics_block(title, df, yesterday, day_before, category=None):
         width=700,
         height=300
     )
-    
+
     st.altair_chart(chart, use_container_width=True)
 
-    # 1-2 Star Reviews from Yesterday
-    st.markdown("---")
-    st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
+        # 1-2 Star Reviews from Yesterday
+        st.markdown("---")
+        st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
     
-    # Tarihi datetime objesine çevir
-    df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
+        # Tarihi datetime objesine çevir
+        df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
     
     # Son 3 günü al
     last_3_days = datetime.datetime.now().date() - timedelta(days=3)
