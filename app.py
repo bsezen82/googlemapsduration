@@ -192,7 +192,7 @@ if page == "Traffic Trends":
 
 # === PAGE 2: REVIEW TRENDS ===
 elif page == "Review Trends":
-    st.title("📅 Hajj Period - Google Review Trends")
+    st.title("🕋 Hajj Period - Google Review Trends")
 
     df = pd.read_csv("Makkah_Hajj_Reviews_Apify.csv", parse_dates=["publishedAtDate"])
     df["date"] = pd.to_datetime(df["publishedAtDate"], errors="coerce").dt.date
