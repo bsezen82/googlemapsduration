@@ -235,7 +235,7 @@ elif page == "Review Trends":
     display_metrics_block("⭐ Overall", df, yesterday, day_before)
 
     # 2️⃣ CATEGORY-WISE
-    for cat in ["Cafes & Restaurants", "Hotels", "Masjid al-Haram", "Mosques & Religious Places"]:
+    for cat in ["Masjid al-Haram", "Mosques & Religious Places", "Hotels", "Cafes & Restaurants"]:
         display_metrics_block(f"🏷 {cat}", df, yesterday, day_before, category=cat)
 
     # 3️⃣ Filtered Trend Chart
