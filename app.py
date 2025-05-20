@@ -195,7 +195,9 @@ elif page == "Review Trends":
     st.title("📅 Hajj Period - Google Review Trends")
 
     df = pd.read_csv("Makkah_Hajj_Reviews_Apify.csv", parse_dates=["publishedAtDate"])
-    df["date"] = pd.to_datetime(df["publishedAtDate"]).dt.date
+    df["date"] = pd.to_datetime(df["publishedAtDate"], errors="coerce").dt.date
+    df = df[pd.notnull(df["date"])]
+
     today = datetime.date.today()
     yesterday = today - timedelta(days=1)
     day_before = today - timedelta(days=2)
@@ -203,30 +205,52 @@ elif page == "Review Trends":
     df_yesterday = df[df["date"] == yesterday]
     df_day_before = df[df["date"] == day_before]
 
+    mean_all = df["stars"].mean()
     mean_yesterday = df_yesterday["stars"].mean()
     mean_day_before = df_day_before["stars"].mean()
-    mean_all = df["stars"].mean()
 
+    count_all = len(df)
     count_yesterday = len(df_yesterday)
     count_day_before = len(df_day_before)
-    count_all = len(df)
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Yesterday", f"{mean_yesterday:.2f}" if not pd.isna(mean_yesterday) else "—")
-    col2.metric("Previous Day", f"{mean_day_before:.2f}" if not pd.isna(mean_day_before) else "—")
-    col3.metric("Hajj Season Overall", f"{mean_all:.2f}" if not pd.isna(mean_all) else "—")
-    col4.metric("Total Review Count", f"{count_all}")
+    st.subheader("⭐️ Average Ratings Overview")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Yesterday", f"{mean_yesterday:.2f}" if not pd.isna(mean_yesterday) else "–")
+    col2.metric("Previous Day", f"{mean_day_before:.2f}" if not pd.isna(mean_day_before) else "–")
+    col3.metric("Overall (Hajj Period)", f"{mean_all:.2f}" if not pd.isna(mean_all) else "–")
 
-    daily_avg = df.groupby("date")["stars"].mean().reset_index()
+    # Category-wise averages
+    st.subheader("📊 Ratings by Category")
+    categories = df["category"].dropna().unique()
+    cat_avg = df.groupby("category")["stars"].mean().reset_index()
+    st.dataframe(cat_avg, use_container_width=True)
 
+    # Review counts
+    st.subheader("🧮 Review Counts")
+    col4, col5, col6 = st.columns(3)
+    col4.metric("Yesterday", count_yesterday)
+    col5.metric("Previous Day", count_day_before)
+    col6.metric("Overall", count_all)
+
+    # Daily trend with filter
+    st.subheader("📈 Daily Average Rating Trend")
+    category_filter = st.selectbox("Filter by Category", ["All"] + list(categories))
+    trend_df = df.copy()
+    if category_filter != "All":
+        trend_df = trend_df[trend_df["category"] == category_filter]
+
+    daily_avg = trend_df.groupby("date")["stars"].mean().reset_index()
     chart = alt.Chart(daily_avg).mark_line(point=True).encode(
-        x=alt.X("date:T", title="Tarih"),
+        x=alt.X("date:T", title="Date"),
         y=alt.Y("stars:Q", title="Average Rating"),
         tooltip=["date", "stars"]
-    ).properties(
-        title="📈 Daily Average Ratings",
-        width=700,
-        height=300
-    )
+    ).properties(height=300)
 
     st.altair_chart(chart, use_container_width=True)
+
+    # 1-2 Star Reviews from Yesterday
+    st.subheader("❗ 1-2 Star Reviews from Yesterday")
+    low_star_reviews = df_yesterday[df_yesterday["stars"].isin([1, 2])][[
+        "place_name", "category", "textTranslated", "stars"]]
+
+    st.dataframe(low_star_reviews, use_container_width=True)
