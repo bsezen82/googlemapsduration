@@ -263,25 +263,25 @@ elif page == "Review Trends":
     st.altair_chart(chart, use_container_width=True)
 
     # Son 3 günü al
-# 4️⃣ 1–2 Star Reviews Table
-st.markdown("---")
-st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
+    # 4️⃣ 1–2 Star Reviews Table
+    st.markdown("---")
+    st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
 
-df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
-recent_low = df[
-    (df["stars"].isin([1, 2])) &
-    (df["publishedAt"].dt.date >= today - timedelta(days=3)) &
-    (df["textTranslated"].notna())
-].copy()
+    df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
+    recent_low = df[
+        (df["stars"].isin([1, 2])) &
+        (df["publishedAt"].dt.date >= today - timedelta(days=3)) &
+        (df["textTranslated"].notna())
+    ].copy()
 
-recent_low["publishedAtFormatted"] = recent_low["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
-recent_low = recent_low.sort_values("publishedAt", ascending=False)
+    recent_low["publishedAtFormatted"] = recent_low["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
+    recent_low = recent_low.sort_values("publishedAt", ascending=False)
 
-cols_to_show = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
-st.dataframe(recent_low[cols_to_show].rename(columns={
-    "publishedAtFormatted": "Date",
-    "place_name": "Place",
-    "category": "Category",
-    "textTranslated": "Review",
-    "stars": "Rating"
-}), use_container_width=True)
+    cols_to_show = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
+    st.dataframe(recent_low[cols_to_show].rename(columns={
+        "publishedAtFormatted": "Date",
+        "place_name": "Place",
+        "category": "Category",
+        "textTranslated": "Review",
+        "stars": "Rating"
+    }), use_container_width=True)
