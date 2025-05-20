@@ -2,10 +2,17 @@ import streamlit as st
 import pandas as pd
 import datetime
 import altair as alt
+from datetime import timedelta
 
-st.set_page_config(page_title="Hajj Travel Dashboard", layout="wide")
-st.title("🕋 Hajj Period - Makkah Trafic Report")
 
+st.set_page_config(page_title="Hajj Dashboard", layout="wide")
+st.sidebar.title("📊 Dashboard Navigation")
+page = st.sidebar.radio("Sayfa Seç", ["Traffic Trends", "Review Trends"])
+
+# === PAGE 1: TRAFFIC TRENDS ===
+if page == "Traffic Trends":
+    st.title("🕋 Hajj Period - Makkah Traffic Report")
+    
 def load_data():
     df = pd.read_csv("travel_durations.csv")
     df["API Call Time"] = pd.to_datetime(df["API Call Time"])
@@ -188,3 +195,43 @@ if not sample_row.empty:
     draw_osrm_route_map(origin_lat, origin_lng, dest_lat, dest_lng)
 
 
+# === PAGE 2: REVIEW TRENDS ===
+elif page == "Review Trends":
+    st.title("📅 Hajj Period - Google Review Trends")
+
+    df = pd.read_csv("Makkah_Hajj_Reviews_Apify.csv", parse_dates=["date"])
+    df["date"] = pd.to_datetime(df["date"]).dt.date
+    today = datetime.date.today()
+    yesterday = today - timedelta(days=1)
+    day_before = today - timedelta(days=2)
+
+    df_yesterday = df[df["date"] == yesterday]
+    df_day_before = df[df["date"] == day_before]
+
+    mean_yesterday = df_yesterday["stars"].mean()
+    mean_day_before = df_day_before["stars"].mean()
+    mean_all = df["stars"].mean()
+
+    count_yesterday = len(df_yesterday)
+    count_day_before = len(df_day_before)
+    count_all = len(df)
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Yesterday", f"{mean_yesterday:.2f}" if not pd.isna(mean_yesterday) else "—")
+    col2.metric("Previous Day", f"{mean_day_before:.2f}" if not pd.isna(mean_day_before) else "—")
+    col3.metric("Hajj Season Overall", f"{mean_all:.2f}" if not pd.isna(mean_all) else "—")
+    col4.metric("Total Review Count", f"{count_all}")
+
+    daily_avg = df.groupby("date")["stars"].mean().reset_index()
+
+    chart = alt.Chart(daily_avg).mark_line(point=True).encode(
+        x=alt.X("date:T", title="Tarih"),
+        y=alt.Y("stars:Q", title="Average Rating"),
+        tooltip=["date", "stars"]
+    ).properties(
+        title="📈 Daily Average Ratings",
+        width=700,
+        height=300
+    )
+
+    st.altair_chart(chart, use_container_width=True)
