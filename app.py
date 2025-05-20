@@ -263,25 +263,25 @@ elif page == "Review Trends":
     st.altair_chart(chart, use_container_width=True)
 
     # Son 3 günü al
-    last_3_days = datetime.datetime.now().date() - timedelta(days=3)
-    low_reviews = df[
-        (df["stars"].isin([1, 2])) &
-        (df["publishedAt"].dt.date >= last_3_days) &
-        (df["textTranslated"].notna())
-    ].copy()
-    
-    # Tarih biçimlendir
-    low_reviews["publishedAtFormatted"] = low_reviews["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
-    
-    # Yeniden eskiye sırala
-    low_reviews = low_reviews.sort_values("publishedAt", ascending=False)
-    
-    # Sadece belirli alanları göster
-    display_cols = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
-    st.dataframe(low_reviews[display_cols].rename(columns={
-        "publishedAtFormatted": "Date",
-        "place_name": "Place",
-        "category": "Category",
-        "textTranslated": "Review",
-        "stars": "Rating"
-    }), use_container_width=True)
+# 4️⃣ 1–2 Star Reviews Table
+st.markdown("---")
+st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
+
+df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
+recent_low = df[
+    (df["stars"].isin([1, 2])) &
+    (df["publishedAt"].dt.date >= today - timedelta(days=3)) &
+    (df["textTranslated"].notna())
+].copy()
+
+recent_low["publishedAtFormatted"] = recent_low["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
+recent_low = recent_low.sort_values("publishedAt", ascending=False)
+
+cols_to_show = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
+st.dataframe(recent_low[cols_to_show].rename(columns={
+    "publishedAtFormatted": "Date",
+    "place_name": "Place",
+    "category": "Category",
+    "textTranslated": "Review",
+    "stars": "Rating"
+}), use_container_width=True)
