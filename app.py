@@ -74,7 +74,7 @@ if page == "Traffic Trends":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader(f"⬅️ From Masjid al-Haram (avg. {from_avg_distance:.1f} km)")
+        st.subheader(f"⬅️ From Masjid al-Haram (avg. {from_haram_avg_distance:.1f} km)")
         st.caption("(Includes routes to: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai))")
         st.metric("Average Duration (min)", f"{from_overall:.1f}" if from_overall else "N/A")
         chart = alt.Chart(from_combined).mark_line(point=True).encode(
@@ -99,7 +99,7 @@ if page == "Traffic Trends":
         st.altair_chart(bar_chart_from, use_container_width=True)
 
     with col2:
-        st.subheader(f"➡️ To Masjid al-Haram (avg. {to_avg_distance:.1f} km)")
+        st.subheader(f"➡️ To Masjid al-Haram (avg. {to_haram_avg_distance:.1f} km)")
         st.caption("(Includes routes from: Al Aziziyah, Al Andulus, Al Diyafah, Al Rusayfah, Kudai)")
         st.metric("Average Duration (min)", f"{to_overall:.1f}" if to_overall else "N/A")
         chart = alt.Chart(to_combined).mark_line(point=True).encode(
