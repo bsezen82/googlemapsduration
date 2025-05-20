@@ -278,7 +278,7 @@ elif page == "Review Trends":
     recent_low["publishedAtFormatted"] = recent_low["publishedAt"].dt.strftime("%Y-%m-%d %H:%M")
     recent_low = recent_low.sort_values("publishedAt", ascending=False)
 
-    cols_to_show = ["publishedAtFormatted", "place_name", "category", "textTranslated", "stars"]
+    cols_to_show = ["place_name", "stars", "textTranslated", "publishedAtFormatted", "category"  ]
     st.dataframe(recent_low[cols_to_show].rename(columns={
         "publishedAtFormatted": "Date",
         "place_name": "Place",
