@@ -12,6 +12,16 @@ MAX_REVIEWS = 200
 SLEEP_SECONDS = 10
 # ==================
 
+selected_fields = [
+    "place_name", "place_id", "category", "text", "name", "isLocalGuide", "textTranslated", "publishedAtDate",
+    "reviewId", "reviewUrl", "reviewDetailedRating", "originalLanguage",
+    "translatedLanguage", "isAdvertisement", "placeId", "location", "city",
+    "countryCode", "categoryName", "categories", "title", "totalScore",
+    "permanentlyClosed", "temporarilyClosed", "scrapedAt", "language",
+    "price", "hotelStars", "reviewerId", "reviewerNumberOfReviews",
+    "likesCount", "stars", "reviewsCount"
+]
+
 df_places = pd.read_excel("Makkah_Attractions.xlsx")
 
 
@@ -56,6 +66,8 @@ for _, row in df_places.iterrows():
         time.sleep(5)
 
 df_all = pd.DataFrame(all_rows)
+df_all = df_all.reindex(columns=selected_fields)
+
 if not df_all.empty:
     df_all.to_csv(("Makkah_Hajj_Reviews_Apify.csv"), mode='a', index=False, header=not pd.io.common.file_exists("Makkah_Hajj_Reviews_Apify.csv"))
 else:
