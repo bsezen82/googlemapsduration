@@ -199,7 +199,7 @@ if page == "Traffic Trends":
 elif page == "Review Trends":
     st.title("📅 Hajj Period - Google Review Trends")
 
-    df = pd.read_csv("Makkah_Hajj_Reviews_Apify.csv", parse_dates=["date"])
+    df = pd.read_csv("Makkah_Hajj_Reviews_Apify.csv", parse_dates=["publishedAtDate"])
     df["date"] = pd.to_datetime(df["publishedAtDate"]).dt.date
     today = datetime.date.today()
     yesterday = today - timedelta(days=1)
