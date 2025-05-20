@@ -7,7 +7,7 @@ import datetime
 
 st.set_page_config(page_title="Hajj Dashboard", layout="wide")
 st.sidebar.title("📊 Dashboard Navigation")
-page = st.sidebar.radio("Sayfa Seç", ["Traffic Trends", "Review Trends"])
+page = st.sidebar.radio("Pages", ["Traffic Trends", "Review Trends"])
 
 # === PAGE 1: TRAFFIC TRENDS ===
 if page == "Traffic Trends":
