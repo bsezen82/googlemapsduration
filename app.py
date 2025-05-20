@@ -249,8 +249,8 @@ elif page == "Review Trends":
     st.altair_chart(chart, use_container_width=True)
 
     # 1-2 Star Reviews from Yesterday
-    st.subheader("❗ 1-2 Star Reviews from Yesterday")
-    low_star_reviews = df_yesterday[df_yesterday["stars"].isin([1, 2])][[
+    st.subheader("❗ 1-2-3 Star Reviews from Yesterday")
+    low_star_reviews = df_yesterday[df_yesterday["stars"].isin([1, 2, 3])][[
         "place_name", "category", "textTranslated", "stars"]]
 
     st.dataframe(low_star_reviews, use_container_width=True)
