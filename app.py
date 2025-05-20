@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import datetime
 import altair as alt
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 st.set_page_config(page_title="Hajj Dashboard", layout="wide")
 st.sidebar.title("📊 Dashboard Navigation")
