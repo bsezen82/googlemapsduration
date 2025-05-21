@@ -276,8 +276,10 @@ elif page == "Review Trends":
 
     st.altair_chart(combined_chart, use_container_width=True)
 
-# Açıklama
-st.markdown("🔵 **Rating** (left axis)   🔴 **Review Count** (right axis)")    
+    # Açıklama
+    st.markdown("🔵 **Rating** (left axis)   🔴 **Review Count** (right axis)")    
+   
+    
     # Son 3 günü al
     # 4️⃣ 1–2 Star Reviews Table
     
