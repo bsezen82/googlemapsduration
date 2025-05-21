@@ -251,27 +251,33 @@ elif page == "Review Trends":
     daily_count = df_filtered.groupby("date")["stars"].count().reset_index(name="review_count")
     daily = pd.merge(daily_avg, daily_count, on="date")
 
-    # Altair Layered Chart
-    line = alt.Chart(daily).mark_line(point=True, color="blue").encode(
+    # Çizgi: Rating (mavi)
+    line = alt.Chart(daily).mark_line(point=True, color="steelblue").encode(
         x=alt.X("date:T", title="Date"),
-        y=alt.Y("avg_rating:Q", title="Average Rating"),
-        tooltip=["date", "avg_rating"]
+        y=alt.Y("avg_rating:Q", title="Average Rating", axis=alt.Axis(titleColor="steelblue")),
+    tooltip=["date", "avg_rating"]
     )
 
-    bar = alt.Chart(daily).mark_bar(opacity=0.3, color="gray").encode(
+    # Bar: Review count (kırmızı)
+    bar = alt.Chart(daily).mark_bar(color="crimson", opacity=0.5).encode(
         x="date:T",
-        y=alt.Y("review_count:Q", title="Review Count"),
+        y=alt.Y("review_count:Q", title="Review Count", axis=alt.Axis(titleColor="crimson")),
         tooltip=["review_count"]
     )
 
-    combined_chart = alt.layer(bar, line).resolve_scale(y='independent').properties(
+    # Layer chart: ayrı eksenlerle
+    combined_chart = alt.layer(bar, line).resolve_scale(
+        y='independent'  # Sol ve sağ ekseni ayrı göster
+    ).properties(
         width=700,
         height=300,
-        title="📊 Average Rating & Review Volume"
+        title="📊 Daily Average Rating & Review Count"
     )
 
     st.altair_chart(combined_chart, use_container_width=True)
-    
+
+# Açıklama
+st.markdown("🔵 **Rating** (left axis)   🔴 **Review Count** (right axis)")    
     # Son 3 günü al
     # 4️⃣ 1–2 Star Reviews Table
     
