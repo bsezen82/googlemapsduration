@@ -238,30 +238,40 @@ elif page == "Review Trends":
     for cat in ["Masjid al-Haram", "Mosques & Religious Places", "Hotels", "Cafes & Restaurants"]:
         display_metrics_block(f"🏷 {cat}", df, yesterday, day_before, category=cat)
 
-    # 3️⃣ Filtered Trend Chart
+    # === TREND CHART ===
     st.markdown("---")
-    st.subheader("📈 Daily Average Rating Trend")
+    st.subheader("📈 Daily Average Rating and Review Count")
 
     category_options = ["All"] + sorted(df["category"].dropna().unique())
     selected_category = st.selectbox("Filter by Category", category_options)
 
-    if selected_category != "All":
-        df_filtered = df[df["category"] == selected_category]
-    else:
-        df_filtered = df
+    df_filtered = df if selected_category == "All" else df[df["category"] == selected_category]
 
-    daily_avg = df_filtered.groupby("date")["stars"].mean().reset_index()
+    daily_avg = df_filtered.groupby("date")["stars"].mean().reset_index(name="avg_rating")
+    daily_count = df_filtered.groupby("date")["stars"].count().reset_index(name="review_count")
+    daily = pd.merge(daily_avg, daily_count, on="date")
 
-    chart = alt.Chart(daily_avg).mark_line(point=True).encode(
+    # Altair Layered Chart
+    line = alt.Chart(daily).mark_line(point=True, color="blue").encode(
         x=alt.X("date:T", title="Date"),
-        y=alt.Y("stars:Q", title="Average Rating"),
-        tooltip=["date", "stars"]
-    ).properties(
-        width=700,
-        height=300
+        y=alt.Y("avg_rating:Q", title="Average Rating"),
+        tooltip=["date", "avg_rating"]
     )
-    st.altair_chart(chart, use_container_width=True)
 
+    bar = alt.Chart(daily).mark_bar(opacity=0.3, color="gray").encode(
+        x="date:T",
+        y=alt.Y("review_count:Q", title="Review Count"),
+        tooltip=["review_count"]
+    )
+
+    combined_chart = alt.layer(bar, line).resolve_scale(y='independent').properties(
+        width=700,
+        height=300,
+        title="📊 Average Rating & Review Volume"
+    )
+
+    st.altair_chart(combined_chart, use_container_width=True)
+    
     # Son 3 günü al
     # 4️⃣ 1–2 Star Reviews Table
     
