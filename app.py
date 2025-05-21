@@ -240,7 +240,7 @@ elif page == "Review Trends":
 
     # === TREND CHART ===
     st.markdown("---")
-    st.subheader("📈 Daily Average Rating and Review Count")
+    st.subheader("📈 Daily Average Rating and Review Count Trends")
 
     category_options = ["All"] + sorted(df["category"].dropna().unique())
     selected_category = st.selectbox("Filter by Category", category_options)
@@ -277,7 +277,7 @@ elif page == "Review Trends":
     st.altair_chart(combined_chart, use_container_width=True)
 
     # Açıklama
-    st.markdown("🔵 **Rating** (left axis)   🔴 **Review Count** (right axis)")    
+    st.markdown("🔵 Average Daily Rating  🔴 Daily Review Count")    
    
     
     # Son 3 günü al
