@@ -284,12 +284,12 @@ elif page == "Review Trends":
     # 4️⃣ 1–2 Star Reviews Table
     
     st.markdown("---")
-    st.subheader("❗ 1–2 Star Reviews from Last 3 Days")
+    st.subheader("❗ 1–2 Star Reviews from Last Week")
 
     df["publishedAt"] = pd.to_datetime(df["publishedAtDate"], errors="coerce")
     recent_low = df[
         (df["stars"].isin([1, 2])) &
-        (df["publishedAt"].dt.date >= today - timedelta(days=3)) &
+        (df["publishedAt"].dt.date >= today - timedelta(days=7)) &
         (df["textTranslated"].notna())
     ].copy()
 
