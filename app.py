@@ -229,7 +229,7 @@ elif page == "Review Trends":
         col4, col5, col6 = st.columns(3)
         col4.metric("Review Count (Yesterday)", len(df[df["date"] == yesterday]))
         col5.metric("Review Count (Previous Day)", len(df[df["date"] == day_before]))
-        col6.metric("Daily Average Review Count (Hajj Season Overall)", len(df) / df["date"].nunique())
+        col6.metric("Daily Average Review Count (Hajj Season Overall)", int(len(df) / df["date"].nunique()))
 
     # 1️⃣ OVERALL
     display_metrics_block("⭐ Overall", df, yesterday, day_before)
