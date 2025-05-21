@@ -251,18 +251,18 @@ elif page == "Review Trends":
     daily_count = df_filtered.groupby("date")["stars"].count().reset_index(name="review_count")
     daily = pd.merge(daily_avg, daily_count, on="date")
 
-    # Çizgi: Rating (mavi)
-    line = alt.Chart(daily).mark_line(point=True, color="steelblue").encode(
-        x=alt.X("date:T", title="Date"),
-        y=alt.Y("avg_rating:Q", title="Average Rating", axis=alt.Axis(titleColor="steelblue")),
-    tooltip=["date", "avg_rating"]
-    )
-
     # Bar: Review count (kırmızı)
     bar = alt.Chart(daily).mark_bar(color="crimson", opacity=0.5).encode(
         x="date:T",
         y=alt.Y("review_count:Q", title="Review Count", axis=alt.Axis(titleColor="crimson")),
         tooltip=["review_count"]
+    )
+
+    # Çizgi: Rating (mavi)
+    line = alt.Chart(daily).mark_line(point=True, color="steelblue").encode(
+        x=alt.X("date:T", title="Date"),
+        y=alt.Y("avg_rating:Q", title="Average Rating", axis=alt.Axis(titleColor="steelblue")),
+    tooltip=["date", "avg_rating"]
     )
 
     # Layer chart: ayrı eksenlerle
